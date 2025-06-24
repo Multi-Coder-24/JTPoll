@@ -1,0 +1,11 @@
+# created by virtualenv automatically
+
+/libs/*
+/Scripts/*
+/Lib/*
+/Lib/site-packages/*
+/pyvenv.cfg
+/CACHEDIR.TAG
+/__init__.py
+/Lib/
+/include/

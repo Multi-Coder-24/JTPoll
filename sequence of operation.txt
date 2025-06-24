@@ -1,0 +1,44 @@
+Dependencies from pip
+    aes_cipher
+    aes
+    cx_freeze
+    PySide6
+    twitchAPI
+
+
+
+Task: Install
+    Password pop-up window get shown
+    Check if user cancelled or password is empty
+        --Quit if true
+    Execute Subtask: GenKey
+    UI Becomes active
+    User enters config values
+        Username
+        Vote_Prefix
+        Poll_Prefix
+    User clicks (Save)
+    Fields get converted to json string
+    Save json string to file (JTPollConfig.json)
+    User clicks (Authorize)
+    Token pop-up window gets shown
+    Checks if user cancelled or token is empty
+        --Quit if true
+    Execute Subtask: SaveToken
+    Close UI
+    Execute Subtask: RunApp
+
+Task: GenKey --password provided as parameter
+    Initialize SHA3-512, SHA3-256, SHAKE-256, PBKDF2SHA512
+    Set password to result of encode password into base64
+    Set salt to SHA3-512 to password
+    Set preKey to result of PBKDF2SHA512 derive key
+    Set mainKey to SHA3-256 of preKey
+    Set mainIV to SHAKE-256 of preKey at 16 bytes
+    Initialize aes instance (256 bit, CBC mode, PKCS#7 padding)
+    Null out mainKey, mainIV, preKey, salt, password for security
+    Set secureKey, secureIV to secrets.token_bytes 32,16 bytes respectively
+    Encrypt secureKey, secureIV with aes instance
+    Set verificationCheck to encrypted string literal "JTPoll"
+    Set secureKey, secureIV, verificationCheck to the result of base64 encoding
+    Write secureKey, secureIV, verificationCheck to file (JTPoll.dat)
