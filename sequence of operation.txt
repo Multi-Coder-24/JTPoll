@@ -21,6 +21,7 @@ Task: Install
     Fields get converted to json string
     Save json string to file (JTPollConfig.json)
     User clicks (Authorize)
+    Application opens web browser
     Token pop-up window gets shown
     Checks if user cancelled or token is empty
         --Quit if true
@@ -28,7 +29,7 @@ Task: Install
     Close UI
     Execute Subtask: RunApp
 
-Task: GenKey --password provided as parameter
+Task: GenKey --password, installFile provided as parameter
     Initialize SHA3-512, SHA3-256, SHAKE-256, PBKDF2SHA512
     Set password to result of encode password into base64
     Set salt to SHA3-512 to password
@@ -42,3 +43,35 @@ Task: GenKey --password provided as parameter
     Set verificationCheck to encrypted string literal "JTPoll"
     Set secureKey, secureIV, verificationCheck to the result of base64 encoding
     Write secureKey, secureIV, verificationCheck to file (JTPoll.dat)
+
+Task: CheckPassword --password, installFile provided as parameters
+    Initialize SHA3-512, SHA3-256, SHAKE-256, PBKDF2SHA512
+    Set password to result of encode password into base64
+    Set salt to SHA3-512 to password
+    Set preKey to result of PBKDF2SHA512 derive key
+    Set mainKey to SHA3-256 of preKey
+    Set mainIV to SHAKE-256 of preKey at 16 bytes
+    Initialize aes instance (256 bit, CBC mode, PKCS#7 padding)
+    Null out mainKey, mainIV, preKey, salt, password for security
+    Set verificationCheck to the last line of file (JTPoll.dat)
+    Decrypt verificationCheck with aes instance
+    returns the result of verificationCheck == "JTPoll"
+
+Task: SaveToken --widget, installFile, token provided as parameters
+    Show password entry dialog
+    Check if user cancelled or password is empty
+        --Quit if true
+    Execute Subtask: CheckPassword
+    Check if return value from CheckPassword is true
+        --Quit if false
+    Execute Subtask: GetCrypt
+    Set preCrypt to the return value of GetCrypt
+    Set mainKey to line 0 of file (JTPoll.dat)
+    Set mainIV to line 1 of file (JTPoll.dat)
+    Decrypt mainKey, mainIV using preCrypt
+    Null out preCrypt for security
+    Initialize aes instance (256 bit, CBC mode, PKCS#7 padding)
+    Encrypt token using aes instance
+    Encode token into base64
+    Null out mainKey, mainIV, aes instance for security
+    Save token to file (JTPollBot.dat)
