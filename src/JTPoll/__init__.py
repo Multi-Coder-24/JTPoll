@@ -1,13 +1,13 @@
+import datetime
 from PySide6.QtWidgets import QApplication
 import sys
 from installer.installutil import *
-from ui.mainscreen import *
-
-
+from installer.installutil import Install
+from app.MainApp import RunApp
 
 if(not isInstalled()):
-    prepInstall()
+    Install()
+else:
+    RunApp()
 
-app = QApplication(sys.argv)
-window = MainWindow()
-app.exec()
+sys.exit(0)

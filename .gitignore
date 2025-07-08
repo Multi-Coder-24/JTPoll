@@ -9,3 +9,4 @@
 /__init__.py
 /Lib/
 /include/
+src/JTPoll/util/secure/*
